@@ -121,3 +121,17 @@
     margin-left: calc(-1 * var(--cui-sidebar-width));
   }
 }
+
+.hiddenFlexContent {
+  display: none;
+}
+
+.html2pdf__container .hiddenFlexContent {
+  display: flex;
+}
+
+@media print {
+  .hiddenFlexContent {
+    display: flex;
+  }
+}

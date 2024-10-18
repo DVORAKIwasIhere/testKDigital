@@ -12,7 +12,7 @@ import {
   CModalFooter,
   CCardHeader,
 } from '@coreui/react-pro'
-import React, { createRef, useEffect, useState } from 'react'
+import React, { createRef, useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import DocumentsApi from './Documents.Api'
 import { useParams } from 'react-router-dom'
@@ -23,6 +23,8 @@ import { cilArrowCircleLeft } from '@coreui/icons'
 import { useTypedSelector } from '../../store'
 import { Viewer, Worker, RenderPageProps } from '@react-pdf-viewer/core'
 import { printOrDownloadDoc } from '../../utils'
+import { useReactToPrint } from 'react-to-print'
+import html2pdf from 'html2pdf.js'
 
 const CustomPageLayer: React.FC<{
   renderPageProps: RenderPageProps
@@ -69,6 +71,24 @@ const Document = (): JSX.Element => {
     })
   }
 
+  const contentRef = useRef<HTMLDivElement>(null)
+  const reactToPrintFn = useReactToPrint({ contentRef: contentRef })
+
+  const handleDownloadPDF = () => {
+    const element = contentRef.current
+    const options = {
+      margin: 0,
+      filename: 'image.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a3',
+        orientation: 'portrait',
+      },
+    }
+    html2pdf().from(element).set(options).save()
+  }
+
   useEffect(() => {
     getDocumentsShow(id)
   }, [id])
@@ -79,7 +99,7 @@ const Document = (): JSX.Element => {
         <CCardHeader className="px-4">
           <div>{docName}</div>
         </CCardHeader>
-        <CCardBody>
+        <CCardBody ref={contentRef}>
           <div
             style={{
               display: 'flex',
@@ -134,6 +154,22 @@ const Document = (): JSX.Element => {
             )}
           </div>
         </CCardBody>
+        <div
+          style={{
+            padding: '0 4rem',
+            paddingBottom: '4rem',
+          }}
+        >
+          <button onClick={() => reactToPrintFn()}>Print</button>
+          <button
+            style={{
+              marginLeft: '4rem',
+            }}
+            onClick={handleDownloadPDF}
+          >
+            Скачать как PDF
+          </button>
+        </div>
       </CCard>
     </CContainer>
   )

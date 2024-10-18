@@ -201,12 +201,26 @@ const OrderDetail = (): JSX.Element => {
     [],
   )
 
-  const contentRef = useRef<HTMLDivElement>(null)
-  const reactToPrintFn = useReactToPrint({ contentRef })
+  const firstContentRef = useRef<HTMLDivElement>(null)
+  const firstReactToPrintFn = useReactToPrint({ contentRef: firstContentRef })
 
-  const handleDownloadPDF = () => {
-    const element = contentRef.current
-    html2pdf().from(element).save()
+  const secondContentRef = useRef<HTMLDivElement>(null)
+  const secondReactToPrintFn = useReactToPrint({ contentRef: secondContentRef })
+
+  const thirdContentRef = useRef<HTMLDivElement>(null)
+  const thirdReactToPrintFn = useReactToPrint({ contentRef: thirdContentRef })
+
+  const handleFirstDownloadPDF = () => {
+    const element = firstContentRef.current
+    html2pdf().from(element).toContainer().save()
+  }
+  const handleSecondDownloadPDF = () => {
+    const element = secondContentRef.current
+    html2pdf().from(element).toContainer().save()
+  }
+  const handleThirdDownloadPDF = () => {
+    const element = thirdContentRef.current
+    html2pdf().from(element).toContainer().save()
   }
 
   useEffect(() => {
@@ -429,13 +443,12 @@ const OrderDetail = (): JSX.Element => {
               </div>
             </CCardHeader>
 
-            <div ref={contentRef}>
+            <div ref={firstContentRef}>
               <CCardBody
                 style={{
                   padding: '6rem 4rem',
                 }}
               >
-                {/* print begin */}
                 <CCol
                   ref={firstSectionRef}
                   style={{
@@ -1142,8 +1155,6 @@ const OrderDetail = (): JSX.Element => {
                     </div>
                   </CForm>
                 </CCol>
-
-                {/* print end */}
               </CCardBody>
             </div>
             <div
@@ -1152,12 +1163,12 @@ const OrderDetail = (): JSX.Element => {
                 paddingBottom: '4rem',
               }}
             >
-              <button onClick={() => reactToPrintFn()}>Print</button>
+              <button onClick={() => firstReactToPrintFn()}>Print</button>
               <button
                 style={{
                   marginLeft: '4rem',
                 }}
-                onClick={handleDownloadPDF}
+                onClick={handleFirstDownloadPDF}
               >
                 Скачать как PDF
               </button>
@@ -1169,436 +1180,444 @@ const OrderDetail = (): JSX.Element => {
               <CCardHeader>
                 <div>Акт отбора проб № {actDetail?.id}</div>
               </CCardHeader>
-              <CCardBody
-                style={{
-                  padding: '4rem 4rem',
-                }}
-              >
-                <CCol
-                  ref={documentRef}
+              <div ref={secondContentRef}>
+                <CCardBody
                   style={{
-                    wordBreak: 'break-word',
+                    padding: '4rem 4rem',
                   }}
                 >
-                  <CForm
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                    }}
+                  <CCol
+                    ref={documentRef}
                     style={{
                       wordBreak: 'break-word',
                     }}
                   >
-                    {/* UPPER INFO BORDER */}
-                    {isView ? (
-                      <div>
-                        <div
-                          style={{
-                            margin: '0 auto',
-                            width: '200px',
-                            fontSize: '16px',
-                            color: 'black',
-                            textAlign: 'center',
-                            fontWeight: 'bold',
-                          }}
-                        >
-                          <p>Акт отбора проб № {actDetail?.id}</p>
+                    <CForm
+                      onSubmit={(e) => {
+                        e.preventDefault()
+                      }}
+                      style={{
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {/* UPPER INFO BORDER */}
+                      {isView ? (
+                        <div>
+                          <div
+                            style={{
+                              margin: '0 auto',
+                              width: '200px',
+                              fontSize: '16px',
+                              color: 'black',
+                              textAlign: 'center',
+                              fontWeight: 'bold',
+                            }}
+                          >
+                            <p>Акт отбора проб № {actDetail?.id}</p>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <></>
-                    )}
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Наименование организации:{' '}
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {data?.user?.company?.name || 'Не выбрано'}
-                        </CFormLabel>
                       ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={'ООО "БТС-МОСТ' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={data?.user?.company?.name}
-                          disabled={true}
-                          /* onChange={(e: any) => {
-                            handleChangeActDetail('nameOfCompany', e)
-                          }} */
-                        />
+                        <></>
                       )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
+                      <div
                         style={{
-                          width: '40%',
+                          display: 'flex',
+                          flexDirection: 'row',
                         }}
                       >
-                        Наименование объекта:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {data?.researchObjects
-                            ? data?.researchObjects?.name
-                            : 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={'Автоматически' as any}
-                          style={{
-                            width: '60%',
-                          }} //setDataAct
-                          value={
-                            data?.researchObjects
-                              ? data?.researchObjects?.name
-                              : 'Не выбрано'
-                          }
-                          disabled={true}
-                          /* onChange={(e: any) => {
-                            handleChangeActDetail('objectName', e)
-                          }} */
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Место отбора проб:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {data?.samplingLocation || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={'Автоматически' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={data?.samplingLocation}
-                          disabled={true}
-                          /* onChange={(e: any) => {
-                            handleChangeActDetail('samplingLocation', e)
-                          }} */
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Объект контроля:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {data?.objectControl || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={'Автоматически' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={data?.objectControl}
-                          disabled={true}
-                          /* onChange={(e: any) => {
-                            handleChangeActDetail('objectOfControl', e)
-                          }} */
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Дата отбора проб:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {getDateV1(actDetail?.samplingDate) || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CDatePicker
-                          required
-                          placeholder={'Выберите дату'}
-                          style={{
-                            width: '60%',
-                          }}
-                          locale="ru-RU"
-                          date={actDetail?.samplingDate}
-                          onDateChange={(e: any) => {
-                            if (!e) {
-                              handleChangeActDetail('samplingDate', '')
-                              return
-                            }
-                            const date = new Date(e)
-                            date.setMinutes(
-                              date.getMinutes() - e.getTimezoneOffset(),
-                            )
-                            handleChangeActDetail(
-                              'samplingDate',
-                              date?.toISOString(),
-                            )
-                          }}
-                          weekdayFormat={1}
-                        />
-                      )}
-                    </div>
-                    {/* START */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Время отбора проб:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {actDetail?.samplingTime || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CTimePicker
-                          seconds={false}
-                          placeholder="Выберите время"
-                          style={{
-                            width: '60%',
-                          }}
-                          time={actDetail?.samplingTime ?? ''}
-                          locale="ru-RU"
-                          onTimeChange={(e: any) => {
-                            const getTime = e.split(/[ ,:]/g)
-                            handleChangeActDetail(
-                              'samplingTime',
-                              `${getTime[0]}:${getTime[1]}:${getTime[2]}`,
-                            )
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Наименование материала:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {actDetail?.materialName || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          required
-                          type="text"
-                          placeholder={'введите наименование материала' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={actDetail?.materialName}
-                          onChange={(e: any) => {
-                            handleChangeActDetail('materialName', e)
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Количество образцов:
-                      </CFormLabel>
-                      {isView ? (
                         <CFormLabel
                           style={{
                             width: '40%',
                           }}
                         >
-                          {actDetail?.samplingQuantity || 'Не выбрано'}
+                          Наименование организации:{' '}
                         </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="string"
-                          placeholder={'введите количество образцов' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={actDetail?.samplingQuantity}
-                          onChange={(e: any) => {
-                            handleChangeActDetail('samplingQuantity', e)
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Документ о качестве:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {actDetail?.qualityDocument || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={'введите № документа о качестве' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={actDetail?.qualityDocument}
-                          onChange={(e: any) => {
-                            handleChangeActDetail('qualityDocument', e)
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                        position: 'relative',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Ответственное лицо:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '60%',
-                          }}
-                        >
-                          {actDetail?.respUser ?? 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {data?.user?.company?.name || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
                           <CFormInput
-                            ref={employeesInput}
+                            type="text"
+                            placeholder={'ООО "БТС-МОСТ' as any}
+                            style={{
+                              width: '60%',
+                            }}
+                            value={data?.user?.company?.name}
+                            disabled={true}
+                            /* onChange={(e: any) => {
+                            handleChangeActDetail('nameOfCompany', e)
+                          }} */
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Наименование объекта:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {data?.researchObjects
+                              ? data?.researchObjects?.name
+                              : 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="text"
+                            placeholder={'Автоматически' as any}
+                            style={{
+                              width: '60%',
+                            }} //setDataAct
+                            value={
+                              data?.researchObjects
+                                ? data?.researchObjects?.name
+                                : 'Не выбрано'
+                            }
+                            disabled={true}
+                            /* onChange={(e: any) => {
+                            handleChangeActDetail('objectName', e)
+                          }} */
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Место отбора проб:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {data?.samplingLocation || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="text"
+                            placeholder={'Автоматически' as any}
+                            style={{
+                              width: '60%',
+                            }}
+                            value={data?.samplingLocation}
+                            disabled={true}
+                            /* onChange={(e: any) => {
+                            handleChangeActDetail('samplingLocation', e)
+                          }} */
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Объект контроля:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {data?.objectControl || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="text"
+                            placeholder={'Автоматически' as any}
+                            style={{
+                              width: '60%',
+                            }}
+                            value={data?.objectControl}
+                            disabled={true}
+                            /* onChange={(e: any) => {
+                            handleChangeActDetail('objectOfControl', e)
+                          }} */
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Дата отбора проб:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {getDateV1(actDetail?.samplingDate) || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CDatePicker
+                            required
+                            placeholder={'Выберите дату'}
+                            style={{
+                              width: '60%',
+                            }}
+                            locale="ru-RU"
+                            date={actDetail?.samplingDate}
+                            onDateChange={(e: any) => {
+                              if (!e) {
+                                handleChangeActDetail('samplingDate', '')
+                                return
+                              }
+                              const date = new Date(e)
+                              date.setMinutes(
+                                date.getMinutes() - e.getTimezoneOffset(),
+                              )
+                              handleChangeActDetail(
+                                'samplingDate',
+                                date?.toISOString(),
+                              )
+                            }}
+                            weekdayFormat={1}
+                          />
+                        )}
+                      </div>
+                      {/* START */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Время отбора проб:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {actDetail?.samplingTime || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CTimePicker
+                            seconds={false}
+                            placeholder="Выберите время"
+                            style={{
+                              width: '60%',
+                            }}
+                            time={actDetail?.samplingTime ?? ''}
+                            locale="ru-RU"
+                            onTimeChange={(e: any) => {
+                              const getTime = e.split(/[ ,:]/g)
+                              handleChangeActDetail(
+                                'samplingTime',
+                                `${getTime[0]}:${getTime[1]}:${getTime[2]}`,
+                              )
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Наименование материала:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {actDetail?.materialName || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            required
                             type="text"
                             placeholder={
-                              'выберите ответственного сотрудника' as any
+                              'введите наименование материала' as any
                             }
                             style={{
                               width: '60%',
                             }}
-                            value={actDetail?.respUser}
+                            value={actDetail?.materialName}
                             onChange={(e: any) => {
-                              handleChangeActDetail('respUser', e.target.value)
+                              handleChangeActDetail('materialName', e)
                             }}
-                            /* onChange={(e: any) => {
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Количество образцов:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '40%',
+                            }}
+                          >
+                            {actDetail?.samplingQuantity || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="string"
+                            placeholder={'введите количество образцов' as any}
+                            style={{
+                              width: '60%',
+                            }}
+                            value={actDetail?.samplingQuantity}
+                            onChange={(e: any) => {
+                              handleChangeActDetail('samplingQuantity', e)
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Документ о качестве:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {actDetail?.qualityDocument || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="text"
+                            placeholder={
+                              'введите № документа о качестве' as any
+                            }
+                            style={{
+                              width: '60%',
+                            }}
+                            value={actDetail?.qualityDocument}
+                            onChange={(e: any) => {
+                              handleChangeActDetail('qualityDocument', e)
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                          position: 'relative',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Ответственное лицо:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '60%',
+                            }}
+                          >
+                            {actDetail?.respUser ?? 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <>
+                            <CFormInput
+                              ref={employeesInput}
+                              type="text"
+                              placeholder={
+                                'выберите ответственного сотрудника' as any
+                              }
+                              style={{
+                                width: '60%',
+                              }}
+                              value={actDetail?.respUser}
+                              onChange={(e: any) => {
+                                handleChangeActDetail(
+                                  'respUser',
+                                  e.target.value,
+                                )
+                              }}
+                              /* onChange={(e: any) => {
                               setEmployeeName(e.target.value)
                               setFilteredEmployeesList(() =>
                                 employeesList.filter((i: any) => {
@@ -1614,11 +1633,11 @@ const OrderDetail = (): JSX.Element => {
 
                               employees.current.style.display = 'block'
                             }} */
-                            /* onFocus={() => {
+                              /* onFocus={() => {
                               employees.current.style.display = 'block'
                             }} */
-                          />
-                          {/* <div
+                            />
+                            {/* <div
                             ref={employees}
                             style={{
                               position: 'absolute',
@@ -1672,120 +1691,132 @@ const OrderDetail = (): JSX.Element => {
                                 : null}
                             </CListGroup>
                           </div> */}
-                        </>
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Примечание:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '40%',
-                          }}
-                        >
-                          {actDetail?.note || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={'введите примечания' as any}
-                          style={{
-                            width: '60%',
-                          }}
-                          value={actDetail?.note}
-                          onChange={(e: any) => {
-                            handleChangeActDetail('note', e)
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        paddingTop: '2%',
-                      }}
-                    >
-                      <CFormLabel
-                        style={{
-                          width: '40%',
-                        }}
-                      >
-                        Условия окружающей среды:
-                      </CFormLabel>
-                      {isView ? (
-                        <CFormLabel
-                          style={{
-                            width: '40%',
-                            whiteSpace: 'normal',
-                          }}
-                        >
-                          {actDetail?.environmental || 'Не выбрано'}
-                        </CFormLabel>
-                      ) : (
-                        <CFormInput
-                          type="text"
-                          placeholder={
-                            'введите условия окружающей среды' as any
-                          }
-                          style={{
-                            width: '60%',
-                          }}
-                          value={actDetail?.environmental}
-                          onChange={(e: any) => {
-                            handleChangeActDetail('environmental', e)
-                          }}
-                        />
-                      )}
-                    </div>
-                    <div
-                      id="sign-section-act"
-                      style={{
-                        display: 'none',
-                      }}
-                    >
+                          </>
+                        )}
+                      </div>
                       <div
                         style={{
                           display: 'flex',
-                          paddingTop: '6rem',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
                         }}
                       >
-                        <div
+                        <CFormLabel
                           style={{
-                            flex: 1,
+                            width: '40%',
                           }}
                         >
-                          <span>Фамилия</span>
-                          <span>{'_'.repeat(20)}</span>
+                          Примечание:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '40%',
+                            }}
+                          >
+                            {actDetail?.note || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="text"
+                            placeholder={'введите примечания' as any}
+                            style={{
+                              width: '60%',
+                            }}
+                            value={actDetail?.note}
+                            onChange={(e: any) => {
+                              handleChangeActDetail('note', e)
+                            }}
+                          />
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'row',
+                          paddingTop: '2%',
+                        }}
+                      >
+                        <CFormLabel
+                          style={{
+                            width: '40%',
+                          }}
+                        >
+                          Условия окружающей среды:
+                        </CFormLabel>
+                        {isView ? (
+                          <CFormLabel
+                            style={{
+                              width: '40%',
+                              whiteSpace: 'normal',
+                            }}
+                          >
+                            {actDetail?.environmental || 'Не выбрано'}
+                          </CFormLabel>
+                        ) : (
+                          <CFormInput
+                            type="text"
+                            placeholder={
+                              'введите условия окружающей среды' as any
+                            }
+                            style={{
+                              width: '60%',
+                            }}
+                            value={actDetail?.environmental}
+                            onChange={(e: any) => {
+                              handleChangeActDetail('environmental', e)
+                            }}
+                          />
+                        )}
+                      </div>
+
+                      <div
+                        className="hiddenFlexContent"
+                        style={{
+                          width: '100%',
+                          justifyContent: 'space-between',
+                          paddingTop: '4rem',
+                        }}
+                      >
+                        <div style={{ display: 'flex', gap: '1px' }}>
+                          Фамилия
+                          <div
+                            style={{
+                              borderBottom: '1px solid black',
+                              width: '200px',
+                            }}
+                          ></div>
                         </div>
-                        <div
-                          style={{
-                            flex: 1,
-                            display: 'flex',
-                            justifyContent: 'end',
-                            flexDirection: 'row',
-                          }}
-                        >
-                          <span>Подпись</span>
-                          <span>{'_'.repeat(20)}</span>
+                        <div style={{ display: 'flex', gap: '1px' }}>
+                          Подпись
+                          <div
+                            style={{
+                              borderBottom: '1px solid black',
+                              width: '200px',
+                            }}
+                          ></div>
                         </div>
                       </div>
-                    </div>
-                  </CForm>
-                </CCol>
-              </CCardBody>
+                    </CForm>
+                  </CCol>
+                </CCardBody>
+              </div>
+              <div
+                style={{
+                  padding: '0 4rem',
+                  paddingBottom: '4rem',
+                }}
+              >
+                <button onClick={() => secondReactToPrintFn()}>Print</button>
+                <button
+                  style={{
+                    marginLeft: '4rem',
+                  }}
+                  onClick={handleSecondDownloadPDF}
+                >
+                  Скачать как PDF
+                </button>
+              </div>
             </CCard>
           ) : (
             <></>
@@ -1883,6 +1914,7 @@ const OrderDetail = (): JSX.Element => {
               style={{
                 padding: '4rem 4rem',
               }}
+              ref={thirdContentRef}
             >
               <CCol
                 ref={commentRef}
@@ -2026,6 +2058,22 @@ const OrderDetail = (): JSX.Element => {
                 </CForm>
               </CCol>
             </CCardBody>
+            <div
+              style={{
+                padding: '0 4rem',
+                paddingBottom: '4rem',
+              }}
+            >
+              <button onClick={() => thirdReactToPrintFn()}>Print</button>
+              <button
+                style={{
+                  marginLeft: '4rem',
+                }}
+                onClick={handleThirdDownloadPDF}
+              >
+                Скачать как PDF
+              </button>
+            </div>
           </CCard>
           {/* PROTOCOL CARD */}
           {data?.protocols?.length ? (
